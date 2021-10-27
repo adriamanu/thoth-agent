@@ -3,9 +3,10 @@ package proc
 import (
 	"fmt"
 	"log"
-	"resources-agent/utils"
 	"strconv"
 	"strings"
+
+	utils "github.com/adriamanu/thoth-agent/utils"
 )
 
 const meminfoFilePath string = "/proc/meminfo"

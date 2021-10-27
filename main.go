@@ -1,7 +1,7 @@
 package main
 
 import (
-	proc "resources-agent/proc"
+	proc "github.com/adriamanu/thoth-agent/proc"
 )
 
 func main() {
