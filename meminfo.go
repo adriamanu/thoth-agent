@@ -1,12 +1,10 @@
-package proc
+package main
 
 import (
 	"fmt"
 	"log"
 	"strconv"
 	"strings"
-
-	utils "github.com/adriamanu/thoth-agent/utils"
 )
 
 const meminfoFilePath string = "/proc/meminfo"
@@ -30,7 +28,7 @@ func getKbSizeFromLine(line string) int {
 
 func parseMeminfoFile(meminfoFileContent string) MemInfo {
 	var m MemInfo
-	splittedMemInfo := utils.SplitFilesByLine(meminfoFileContent)
+	splittedMemInfo := SplitFilesByLine(meminfoFileContent)
 
 	for i := 0; i < len(splittedMemInfo); i++ {
 		line := strings.Split(splittedMemInfo[i], ":")
@@ -52,7 +50,7 @@ func parseMeminfoFile(meminfoFileContent string) MemInfo {
 }
 
 func Meminfo() MemInfo {
-	meminfoFileContent, err := utils.ReadFile(meminfoFilePath)
+	meminfoFileContent, err := ReadFile(meminfoFilePath)
 	if err != nil {
 		log.Fatal(fmt.Sprintf("Cannot open file %s - %v", meminfoFileContent, err))
 	}
