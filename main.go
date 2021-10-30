@@ -3,19 +3,22 @@ package main
 import (
 	"fmt"
 	"time"
+
+	cpu "github.com/adriamanu/thoth-agent/cpu"
+	disk "github.com/adriamanu/thoth-agent/disk"
+	memory "github.com/adriamanu/thoth-agent/memory"
 )
 
 func main() {
 	for {
-	meminfo := Meminfo()
-	memoryPercent := float64(meminfo.MemTotal - meminfo.MemAvailable)/float64(meminfo.MemTotal) * 100.0
-	fmt.Printf("Memory percentage used: %.3f\n", memoryPercent)
+	memory := memory.Stat()
+	fmt.Printf("Memory percentage used: %.3f\n", memory.UsedMemoryPercentage)
 
-	cpuPercent := getCPUPercentage()
-	fmt.Printf("CPU percentage used: %.3f\n", cpuPercent)
+	cpu := cpu.Stat()
+	fmt.Printf("CPU percentage used: %.3f\n", cpu.UsedPercentage)
 
-	disk := DiskUsage()
-	fmt.Printf("Disk percentage used: %.3f\n\n",disk.usedPercentage)
+	disk := disk.Stat()
+	fmt.Printf("Disk percentage used: %.3f\n\n",disk.UsedSpacePercentage)
 
 	// time.Sleep(1 * time.Second)
 	time.Sleep(200 * time.Millisecond)

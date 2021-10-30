@@ -1,10 +1,12 @@
-package main
+package memory
 
 import (
 	"fmt"
 	"log"
 	"strconv"
 	"strings"
+
+	utils "github.com/adriamanu/thoth-agent/utils"
 )
 
 const meminfoFilePath string = "/proc/meminfo"
@@ -15,6 +17,13 @@ type MemInfo struct {
 	MemAvailable int
 	SwapTotal    int
 	SwapFree     int
+}
+
+type MemoryStat struct {
+	TotalMemory     int
+	AvailableMemory int
+	UsedMemory      int
+	UsedMemoryPercentage float64
 }
 
 func getKbSizeFromLine(line string) int {
@@ -28,7 +37,7 @@ func getKbSizeFromLine(line string) int {
 
 func parseMeminfoFile(meminfoFileContent string) MemInfo {
 	var m MemInfo
-	splittedMemInfo := SplitFilesByLine(meminfoFileContent)
+	splittedMemInfo := utils.SplitFilesByLine(meminfoFileContent)
 
 	for i := 0; i < len(splittedMemInfo); i++ {
 		line := strings.Split(splittedMemInfo[i], ":")
@@ -49,12 +58,26 @@ func parseMeminfoFile(meminfoFileContent string) MemInfo {
 	return m
 }
 
-func Meminfo() MemInfo {
-	meminfoFileContent, err := ReadFile(meminfoFilePath)
+func UsedMemory(available, total int) int {
+	return total - available
+}
+
+func UsedPercentage(available, total int) float64 {
+	return float64(UsedMemory(available, total))/float64(available) * 100.0
+}
+
+func Stat() MemoryStat {
+	meminfoFileContent, err := utils.ReadFile(meminfoFilePath)
 	if err != nil {
 		log.Fatal(fmt.Sprintf("Cannot open file %s - %v", meminfoFilePath, err))
 	}
 
 	meminfo := parseMeminfoFile(meminfoFileContent)
-	return meminfo
+
+	return MemoryStat{
+		TotalMemory: meminfo.MemTotal,
+		AvailableMemory: meminfo.MemAvailable,
+		UsedMemory: UsedMemory(meminfo.MemAvailable, meminfo.MemTotal),
+		UsedMemoryPercentage: UsedPercentage(meminfo.MemAvailable, meminfo.MemTotal),
+	}
 }
