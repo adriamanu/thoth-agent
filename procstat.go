@@ -64,17 +64,17 @@ func getCPUUsage(current, previous CPUTime) float64 {
 var previous CPUTime
 
 func getCPUPercentage() float64 {
-		var cpuPercent float64 = 0
-		procstatContent, err := ReadFile(procstatFilePath)
-		if err != nil {
-			log.Fatal(fmt.Sprintf("Cannot open file %s - %v", procstatFilePath), err)
-		}
+	var cpuPercent float64 = 0
+	procstatContent, err := ReadFile(procstatFilePath)
+	if err != nil {
+		log.Fatal(fmt.Sprintf("Cannot open file %s - %v", procstatFilePath), err)
+	}
 
-		cpuTime := getCPUTime(procstatContent)
-		
-		if (CPUTime{}) != previous {
-			cpuPercent = getCPUUsage(cpuTime, previous)
-		}
-		previous = cpuTime
-		return cpuPercent
+	cpuTime := getCPUTime(procstatContent)
+
+	if (CPUTime{}) != previous {
+		cpuPercent = getCPUUsage(cpuTime, previous)
+	}
+	previous = cpuTime
+	return cpuPercent
 }

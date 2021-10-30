@@ -52,7 +52,7 @@ func parseMeminfoFile(meminfoFileContent string) MemInfo {
 func Meminfo() MemInfo {
 	meminfoFileContent, err := ReadFile(meminfoFilePath)
 	if err != nil {
-		log.Fatal(fmt.Sprintf("Cannot open file %s - %v", meminfoFileContent, err))
+		log.Fatal(fmt.Sprintf("Cannot open file %s - %v", meminfoFilePath, err))
 	}
 
 	meminfo := parseMeminfoFile(meminfoFileContent)
