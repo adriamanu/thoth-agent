@@ -11,16 +11,16 @@ import (
 
 func main() {
 	for {
-	memory := memory.Stat()
-	fmt.Printf("Memory percentage used: %.3f\n", memory.UsedMemoryPercentage)
+		memory := memory.Stat()
+		fmt.Printf("Memory percentage used: %.3f\n", memory.UsedMemoryPercentage)
 
-	cpu := cpu.Stat()
-	fmt.Printf("CPU percentage used: %.3f\n", cpu.UsedPercentage)
+		cpu := cpu.Stat()
+		fmt.Printf("CPU percentage used: %.3f\n", cpu.UsedPercentage)
 
-	disk := disk.Stat()
-	fmt.Printf("Disk percentage used: %.3f\n\n",disk.UsedSpacePercentage)
+		disk := disk.Stat()
+		fmt.Printf("Disk percentage used: %.3f\n\n", disk.UsedSpacePercentage)
 
-	// time.Sleep(1 * time.Second)
-	time.Sleep(200 * time.Millisecond)
-}
+		// time.Sleep(1 * time.Second)
+		time.Sleep(200 * time.Millisecond)
+	}
 }
