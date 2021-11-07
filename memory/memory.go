@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	utils "github.com/adriamanu/thoth-agent/utils"
+	"github.com/adriamanu/thoth-agent/utils"
 )
 
 const meminfoFilePath string = "/proc/meminfo"
@@ -20,9 +20,9 @@ type MemInfo struct {
 }
 
 type MemoryStat struct {
-	TotalMemory     int
-	AvailableMemory int
-	UsedMemory      int
+	TotalMemory          int
+	AvailableMemory      int
+	UsedMemory           int
 	UsedMemoryPercentage float64
 }
 
@@ -63,7 +63,7 @@ func UsedMemory(available, total int) int {
 }
 
 func UsedPercentage(available, total int) float64 {
-	return float64(UsedMemory(available, total))/float64(available) * 100.0
+	return float64(UsedMemory(available, total)) / float64(available) * 100.0
 }
 
 func Stat() MemoryStat {
@@ -75,9 +75,9 @@ func Stat() MemoryStat {
 	meminfo := parseMeminfoFile(meminfoFileContent)
 
 	return MemoryStat{
-		TotalMemory: meminfo.MemTotal,
-		AvailableMemory: meminfo.MemAvailable,
-		UsedMemory: UsedMemory(meminfo.MemAvailable, meminfo.MemTotal),
+		TotalMemory:          meminfo.MemTotal,
+		AvailableMemory:      meminfo.MemAvailable,
+		UsedMemory:           UsedMemory(meminfo.MemAvailable, meminfo.MemTotal),
 		UsedMemoryPercentage: UsedPercentage(meminfo.MemAvailable, meminfo.MemTotal),
 	}
 }

@@ -3,15 +3,15 @@ package disk
 import (
 	"log"
 
-	unix "golang.org/x/sys/unix"
+	"golang.org/x/sys/unix"
 )
 
 const rootPath string = "/"
 
 type DiskStat struct {
-	TotalSpace     uint64
-	AvailableSpace uint64
-	UsedSpace      uint64
+	TotalSpace          uint64
+	AvailableSpace      uint64
+	UsedSpace           uint64
 	UsedSpacePercentage float64
 }
 
@@ -25,7 +25,7 @@ func Available(disk unix.Statfs_t) uint64 {
 
 func Used(disk unix.Statfs_t) uint64 {
 	return Total(disk) - Available(disk)
-} 
+}
 
 func UsedPercentage(disk unix.Statfs_t) float64 {
 	return float64(Used(disk)) / float64(Total(disk)) * 100.0
@@ -39,14 +39,14 @@ func Stat() DiskStat {
 	}
 
 	total := Total(diskStat)
-	available := Available(diskStat)	
+	available := Available(diskStat)
 	used := Used(diskStat)
-	usedPercentage := UsedPercentage(diskStat) 
+	usedPercentage := UsedPercentage(diskStat)
 
 	return DiskStat{
-		TotalSpace: total,
-		AvailableSpace: available,
-		UsedSpace: used,
+		TotalSpace:          total,
+		AvailableSpace:      available,
+		UsedSpace:           used,
 		UsedSpacePercentage: usedPercentage,
 	}
 }

@@ -28,17 +28,16 @@ func healthCheckHandler(res http.ResponseWriter, req *http.Request) {
 }
 
 type resourceUsage struct {
-	Cpu cpu.CPUStat `json:"cpu"`
+	Cpu    cpu.CPUStat       `json:"cpu"`
 	Memory memory.MemoryStat `json:"memory"`
-	Disk disk.DiskStat `json:"disk"`
+	Disk   disk.DiskStat     `json:"disk"`
 }
-
 
 func resourceUsageHandler(res http.ResponseWriter, req *http.Request) {
 	c := cpu.Stat()
 	m := memory.Stat()
 	d := disk.Stat()
-	ru, err := json.Marshal(resourceUsage{c,m, d})
+	ru, err := json.Marshal(resourceUsage{c, m, d})
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -48,7 +47,7 @@ func resourceUsageHandler(res http.ResponseWriter, req *http.Request) {
 }
 
 func visualizationHandler(res http.ResponseWriter, req *http.Request) {
-http.ServeFile(res, req, "./server/chart.html")
+	http.ServeFile(res, req, "./server/chart.html")
 }
 
 func Server() {
