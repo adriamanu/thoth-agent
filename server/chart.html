@@ -33,19 +33,29 @@
 
         // CPU CHART
         const cpuChart = new Chart(document.getElementById('cpu-chart').getContext('2d'), {
-            type: 'line',
-            data: {
-                labels: chartLabels,
-                datasets: [
-                    {
-                        data: [],
-                        label: "Consumed CPU",
-                        borderColor: "#E40830",
-                        fill: false
+                options: {
+                    scales: {
+                        y: {
+                            display: true,
+                            min: 0,
+                            max: 100,
+                        }
                     }
-                ]
-            },
-        });
+                },
+                type: 'line',
+                data: {
+                    labels: chartLabels,
+                    datasets: [
+                        {
+                            data: [0],
+                            label: "Consumed CPU",
+                            borderColor: "#E40830",
+                            fill: false
+                        }
+                    ]
+                },
+            }
+        );
 
         // MEMORY CHART
         const memoryChart = new Chart(document.getElementById('memory-chart').getContext('2d'), {
@@ -95,7 +105,8 @@
                     ],
                     hoverOffset: 4
                 }]
-            }})
+            }
+        })
 
         while (true) {
             const resources = await getResources()
@@ -114,15 +125,15 @@
             }
             cpuChart.data.datasets[0].data.push(resources.cpu.UsedPercentage)
 
-            // Memory
+            // MEMORY
             memoryChart.data.datasets[0].data[0] = resources.memory.UsedMemory
             memoryChart.data.datasets[1].data[0] = resources.memory.AvailableMemory
 
-            // Disk
+            // DISK
             diskChart.data.datasets[0].data[0] = resources.disk.UsedSpace
             diskChart.data.datasets[0].data[1] = resources.disk.AvailableSpace
 
-            // Update charts
+            // UPDATE
             cpuChart.update()
             memoryChart.update()
             diskChart.update()
