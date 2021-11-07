@@ -31,7 +31,7 @@ type resourceUsage struct {
 	Cpu    cpu.CPUStat       `json:"cpu"`
 	Memory memory.MemoryStat `json:"memory"`
 	Disk   disk.DiskStat     `json:"disk"`
-	Date   string `json:"date"`
+	Date   string            `json:"date"`
 }
 
 func resourceUsageHandler(res http.ResponseWriter, req *http.Request) {
