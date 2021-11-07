@@ -18,7 +18,7 @@ type healthStruct struct {
 }
 
 func healthCheckHandler(res http.ResponseWriter, req *http.Request) {
-	healthAsJson, err := json.Marshal(healthStruct{Status: "alive", Date: time.Now().String()})
+	healthAsJson, err := json.Marshal(healthStruct{"alive", time.Now().String()})
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -31,13 +31,14 @@ type resourceUsage struct {
 	Cpu    cpu.CPUStat       `json:"cpu"`
 	Memory memory.MemoryStat `json:"memory"`
 	Disk   disk.DiskStat     `json:"disk"`
+	Date   string `json:"date"`
 }
 
 func resourceUsageHandler(res http.ResponseWriter, req *http.Request) {
 	c := cpu.Stat()
 	m := memory.Stat()
 	d := disk.Stat()
-	ru, err := json.Marshal(resourceUsage{c, m, d})
+	ru, err := json.Marshal(resourceUsage{c, m, d, time.Now().String()})
 	if err != nil {
 		log.Fatal(err)
 	}

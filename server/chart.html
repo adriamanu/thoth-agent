@@ -1,69 +1,95 @@
 <!doctype html>
-
 <html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Thoth</title>
+    <meta name="description" content="Thoth-Agent resources graphs.">
+</head>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<body>
+<div class="chart-container" style="position: relative; height:720px; width:1280px">
+    <canvas id="cpu-chart"></canvas>
+</div>
+<div class="chart-container" style="position: relative; height:360px; width:360px">
+    <canvas id="memory-chart"></canvas>
+</div>
+<script>
+    async function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
 
-        <title>Thoth</title>
-        <meta name="description" content="Thoth-Agent resources graphs.">
+    async function getResources() {
+        const response = await fetch("http://localhost:11805/resource-usage")
+        return await response.json()
+    }
 
-    </head>
+    async function loop() {
+        // COMMON LABELS
+        const chartLabels = []
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    <body>
-<!--        <div>-->
-<!--            <canvas id="cpu-chart" width="400" height="400"></canvas>-->
-<!--        </div>-->
-<!--        <div>-->
-<!--            <canvas id="disk-chart" width="400" height="400"></canvas>-->
-<!--        </div>-->
-    <div class="chart-container" style="position: relative; height:720px; width:1280px">
-        <canvas id="cpu-chart"></canvas>
-    </div>
-
-    <script>
-        async function sleep(ms) {
-            return new Promise(resolve => setTimeout(resolve, ms));
-        }
-
-        async function loop() {
-            const cpuChart = new Chart(document.getElementById('cpu-chart').getContext('2d'), {
-                type: 'line',
-                responsive: false,
-                options: {
-                    legend: { display: false },
-                    title: {
-                        display: true,
-                        text: 'CPU usage over X last seconds'
+        // CPU CHART
+        const cpuChart = new Chart(document.getElementById('cpu-chart').getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: chartLabels,
+                datasets: [
+                    {
+                        data: [],
+                        label: "Consumed CPU",
+                        borderColor: "#E40830",
+                        fill: false
                     }
-                },
-                data: {
-                    labels: ["10h10", "10h11", "10h12", "10h13", "10h14", "10h15", "10h16", "10h17", "10h18", "10h19", "10h20"],
-                    datasets: [
-                        {
-                            data: [24, 34, 44,50, 55, 60,90, 92, 70.28, 40.24, 50],
-                            label: "Consumed",
-                            borderColor: "#3e95cd",
-                            fill: false
-                        }
-                    ]
-                },
-            });
+                ]
+            },
+        });
 
-            for (let i = 0; i < 30; i++) {
-                const newData = cpuChart.data.datasets[0].data
-                for (const j in newData) {
-                    console.log("J = ", j , "newData[j]=", newData[j])
-                    newData[j] = newData[j] + i
-                }
+        // Memory CHART
+        const memoryChart = new Chart(document.getElementById('memory-chart').getContext('2d'), {
+            type: "doughnut",
+            data: {
+                labels: [
+                    'Free Memory',
+                    'Used Memory',
+                ],
+                datasets: [{
+                    data: [],
+                    backgroundColor: [
+                        'rgb(0, 255, 0)',
+                        'rgb(255, 0, 255)',
+                    ],
+                    hoverOffset: 4
+                }]
+            }})
 
-                cpuChart.data.datasets[0].data = newData
-                cpuChart.update()
-                await sleep(300)
+        while (true) {
+            const resources = await getResources()
+            const iterations = 60
+
+            // COMMON LABELS
+            if (chartLabels.length === iterations) {
+                chartLabels.shift()
             }
+            chartLabels.push(resources.date)
+
+            // CPU
+            if (cpuChart.data.datasets[0].data.length === iterations) {
+                // append new element at end of the array and remove the first one
+                cpuChart.data.datasets[0].data.shift()
+            }
+            cpuChart.data.datasets[0].data.push(resources.cpu.UsedPercentage)
+
+            // Memory
+            memoryChart.data.datasets[0].data[0] = resources.memory.UsedMemory
+            memoryChart.data.datasets[0].data[1] = resources.memory.AvailableMemory
+
+            // Update charts
+            cpuChart.update()
+            memoryChart.update()
+
+            await sleep(1000)
         }
-        loop()
-    </script>
+    }
+    loop()
+</script>
 </html>
