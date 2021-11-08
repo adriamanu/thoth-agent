@@ -28,7 +28,7 @@ func healthCheckHandler(res http.ResponseWriter, req *http.Request) {
 }
 
 type resourceUsage struct {
-	Cpu    cpu.CPUStat       `json:"cpu"`
+	Cpu    []cpu.CoreStat    `json:"cpu"`
 	Memory memory.MemoryStat `json:"memory"`
 	Disk   disk.DiskStat     `json:"disk"`
 	Date   string            `json:"date"`

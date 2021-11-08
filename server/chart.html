@@ -27,6 +27,13 @@
         return await response.json()
     }
 
+    function randomColor() {
+        const r = Math.floor(Math.random() * 255);
+        const g = Math.floor(Math.random() * 255);
+        const b = Math.floor(Math.random() * 255);
+        return "rgb(" + r + "," + g + "," + b + ")";
+    };
+
     async function loop() {
         // COMMON LABELS
         const chartLabels = []
@@ -48,7 +55,7 @@
                     datasets: [
                         {
                             data: [0],
-                            label: "Consumed CPU",
+                            label: "CPU GLOBAL USAGE",
                             borderColor: "#E40830",
                             fill: false
                         }
@@ -119,11 +126,23 @@
             chartLabels.push(resources.date)
 
             // CPU
-            if (cpuChart.data.datasets[0].data.length === iterations) {
+            for (let i = 0; i < resources.cpu.length; i++) {
+                // Init if empty
+                if (!cpuChart.data.datasets[i]) {
+                    cpuChart.data.datasets[i] = {
+                        data: [],
+                        label: i === 0 ? "GLOBAL CPU USAGE" : resources.cpu[i].Core,
+                        // color random
+                        borderColor:randomColor()
+                    }
+                }
                 // append new element at end of the array and remove the first one
-                cpuChart.data.datasets[0].data.shift()
+                if (cpuChart.data.datasets[i].data.length === iterations) {
+                    cpuChart.data.datasets[i].data.shift()
+                }
+
+                cpuChart.data.datasets[i].data.push(resources.cpu[i].UsedPercentage)
             }
-            cpuChart.data.datasets[0].data.push(resources.cpu.UsedPercentage)
 
             // MEMORY
             memoryChart.data.datasets[0].data[0] = resources.memory.UsedMemory
