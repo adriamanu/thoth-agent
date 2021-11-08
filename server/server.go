@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"time"
+	_ "embed"
 
 	"github.com/adriamanu/thoth-agent/cpu"
 	"github.com/adriamanu/thoth-agent/disk"
@@ -47,8 +48,13 @@ func resourceUsageHandler(res http.ResponseWriter, req *http.Request) {
 	fmt.Fprintf(res, "%s", ru)
 }
 
+
+//go:embed chart.html
+var chart []byte
+
 func visualizationHandler(res http.ResponseWriter, req *http.Request) {
-	http.ServeFile(res, req, "./server/chart.html")
+	res.WriteHeader(200)
+	fmt.Fprintf(res, "%s", string(chart))
 }
 
 func Server() {
