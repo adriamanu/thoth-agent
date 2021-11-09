@@ -3,7 +3,7 @@ dev:
 run:
 	go run *.go
 build:
-	go build *.go
+	go build
 lint:
 	gofmt -l -w -s *.go
 stress:

@@ -29,7 +29,7 @@ func healthCheckHandler(res http.ResponseWriter, req *http.Request) {
 }
 
 type resourceUsage struct {
-	Cpu    []cpu.CoreStat    `json:"cpu"`
+	Cpu    []cpu.ProcStat    `json:"cpu"`
 	Memory memory.MemoryStat `json:"memory"`
 	Disk   disk.DiskStat     `json:"disk"`
 	Date   string            `json:"date"`
@@ -48,12 +48,12 @@ func resourceUsageHandler(res http.ResponseWriter, req *http.Request) {
 	fmt.Fprintf(res, "%s", ru)
 }
 
-//go:embed chart.html
-var chart []byte
+//go:embed index.html
+var index []byte
 
 func visualizationHandler(res http.ResponseWriter, req *http.Request) {
 	res.WriteHeader(200)
-	fmt.Fprintf(res, "%s", string(chart))
+	fmt.Fprintf(res, "%s", string(index))
 }
 
 func Server() {

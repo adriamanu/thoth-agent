@@ -14,6 +14,5 @@ func ReadFile(path string) (string, error) {
 }
 
 func SplitFilesByLine(fileContent string) []string {
-	splittedFile := strings.Split(fileContent, "\n")
-	return splittedFile
+	return strings.Split(fileContent, "\n")
 }

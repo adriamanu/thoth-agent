@@ -162,8 +162,8 @@
             }
 
             // MEMORY
-            memoryChart.data.datasets[0].data[0] = resources.memory.UsedMemory
-            memoryChart.data.datasets[1].data[0] = resources.memory.AvailableMemory
+            memoryChart.data.datasets[0].data[0] = resources.memory.MemUsed
+            memoryChart.data.datasets[1].data[0] = resources.memory.MemAvail
 
             // DISK
             diskChart.data.datasets[0].data[0] = resources.disk.UsedSpace
