@@ -1,167 +1,184 @@
 <!doctype html>
 <html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Thoth</title>
+    <meta name="description" content="Thoth-Agent resources graphs.">
+</head>
+<!--    ChartJS & Plugin to display data values on charts-->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+<body>
+<div class="chart-container" style="height:720px; width:1280px">
+    <canvas id="cpu-chart"></canvas>
+</div>
+<div class="container" style="display: grid; grid-template-columns: 1fr 1fr; height:720px; width:1280px">
+    <div class="chart-container" style="height:720px; width:640px">
+        <canvas id="memory-chart"></canvas>
+    </div>
+    <div class="chart-container" style="height:360px; width:360px">
+        <canvas id="disk-chart"></canvas>
+    </div>
+</div>
+<script>
+    async function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
 
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Thoth</title>
-        <meta name="description" content="Thoth-Agent resources graphs.">
-    </head>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    async function getResources() {
+        const response = await fetch("http://localhost:11805/resource-usage")
+        return await response.json()
+    }
 
-    <body>
-        <div class="chart-container" style="position: relative; height:720px; width:1280px">
-            <canvas id="cpu-chart"></canvas>
-        </div>
-        <div class="chart-container" style="position: relative; height:360px; width:360px">
-            <canvas id="memory-chart"></canvas>
-        </div>
-        <div class="chart-container" style="position: relative; height:360px; width:360px">
-            <canvas id="disk-chart"></canvas>
-        </div>
-        <script>
-            async function sleep(ms) {
-                return new Promise(resolve => setTimeout(resolve, ms));
-            }
+    function randomRGBColor() {
+        const r = Math.floor(Math.random() * 255);
+        const g = Math.floor(Math.random() * 255);
+        const b = Math.floor(Math.random() * 255);
+        return "rgb(" + r + "," + g + "," + b + ")"
+    }
 
-            async function getResources() {
-                const response = await fetch("http://localhost:11805/resource-usage")
-                return await response.json()
-            }
+    function randomHexColor() {
+        return "#" + Math.floor(Math.random() * 16777215).toString(16)
+    }
 
-            function randomRGBColor() {
-                const r = Math.floor(Math.random() * 255);
-                const g = Math.floor(Math.random() * 255);
-                const b = Math.floor(Math.random() * 255);
-                return "rgb(" + r + "," + g + "," + b + ")"
-            }
+    async function loop() {
+        // COMMON LABELS
+        const chartLabels = []
 
-            function randomHexColor() {
-                return "#" + Math.floor(Math.random() * 16777215).toString(16)
-            }
-
-            async function loop() {
-                // COMMON LABELS
-                const chartLabels = []
-
-                // CPU CHART
-                const cpuChart = new Chart(document.getElementById('cpu-chart').getContext('2d'), {
-                    options: {
-                        scales: {
-                            y: {
-                                display: true,
-                                min: 0,
-                                max: 100,
-                            }
-                        }
-                    },
-                    type: 'line',
-                    data: {
-                        labels: chartLabels,
-                        datasets: [{
-                            data: [0],
-                            label: "CPU GLOBAL USAGE",
-                            borderColor: "#E40830",
-                            fill: false,
-                            borderWidth: 8
-                        }]
-                    },
-                });
-
-                // MEMORY CHART
-                const memoryChart = new Chart(document.getElementById('memory-chart').getContext('2d'), {
-                    type: "bar",
-                    options: {
-                        scales: {
-                            x: {
-                                stacked: true
-                            },
-                            y: {
-                                stacked: true
-                            }
-                        }
-                    },
-                    data: {
-                        labels: ['Memory'],
-                        datasets: [{
-                            data: [],
-                            label: "Memory Used",
-                            backgroundColor: randomHexColor(),
-                            borderWidth: 1
-                        },
-                            {
-                                data: [],
-                                label: "Memory Available",
-                                backgroundColor: randomHexColor(),
-                                borderWidth: 1
-                            }
-                        ],
+        // CPU CHART
+        const cpuChart = new Chart(document.getElementById('cpu-chart').getContext('2d'), {
+            options: {
+                scales: {
+                    y: {
+                        display: true,
+                        min: 0,
+                        max: 100,
                     }
-                })
-
-                // DISK CHART
-                const diskChart = new Chart(document.getElementById('disk-chart').getContext('2d'), {
-                    type: "doughnut",
-                    data: {
-                        labels: [
-                            'Used Disk',
-                            'Free Disk',
-                        ],
-                        datasets: [{
-                            data: [],
-                            backgroundColor: [randomHexColor(), randomHexColor()],
-                            hoverOffset: 4
-                        }]
-                    }
-                })
-
-                while (true) {
-                    const resources = await getResources()
-                    const iterations = 60
-
-                    // COMMON LABELS
-                    if (chartLabels.length === iterations) {
-                        chartLabels.shift()
-                    }
-                    chartLabels.push(resources.date)
-
-                    // CPU
-                    for (let i = 0; i < resources.cpu.length; i++) {
-                        // Init if empty
-                        if (!cpuChart.data.datasets[i]) {
-                            cpuChart.data.datasets[i] = {
-                                data: [],
-                                label: i === 0 ? "GLOBAL CPU USAGE" : resources.cpu[i].Core,
-                                // color random
-                                borderColor: randomHexColor(),
-                            }
-                        }
-                        // append new element at end of the array and remove the first one
-                        if (cpuChart.data.datasets[i].data.length === iterations) {
-                            cpuChart.data.datasets[i].data.shift()
-                        }
-
-                        cpuChart.data.datasets[i].data.push(resources.cpu[i].UsedPercentage)
-                    }
-
-                    // MEMORY
-                    memoryChart.data.datasets[0].data[0] = resources.memory.UsedMemory
-                    memoryChart.data.datasets[1].data[0] = resources.memory.AvailableMemory
-
-                    // DISK
-                    diskChart.data.datasets[0].data[0] = resources.disk.UsedSpace
-                    diskChart.data.datasets[0].data[1] = resources.disk.AvailableSpace
-
-                    // UPDATE
-                    cpuChart.update()
-                    memoryChart.update()
-                    diskChart.update()
-
-                    await sleep(1000)
                 }
+            },
+            type: 'line',
+            data: {
+                labels: chartLabels,
+                datasets: [{
+                    data: [0],
+                    label: "CPU GLOBAL USAGE",
+                    borderColor: "#E40830",
+                    fill: false,
+                    borderWidth: 8
+                }]
+            },
+        });
+
+        // MEMORY CHART
+        const memoryChart = new Chart(document.getElementById('memory-chart').getContext('2d'), {
+            plugins: [ChartDataLabels],
+            type: "bar",
+            options: {
+                plugins: {
+                    datalabels: {
+                        color: "#FFFFFF"
+                    }
+                },
+                scales: {
+                    x: {
+                        stacked: true
+                    },
+                    y: {
+                        stacked: true
+                    }
+                }
+            },
+            data: {
+                labels: ['Memory'],
+                datasets: [{
+                    data: [],
+                    label: "Memory Used",
+                    backgroundColor: randomHexColor(),
+                    borderWidth: 1
+                },
+                    {
+                        data: [],
+                        label: "Memory Available",
+                        backgroundColor: randomHexColor(),
+                        borderWidth: 1
+                    }
+                ],
+            }
+        })
+
+        // DISK CHART
+        const diskChart = new Chart(document.getElementById('disk-chart').getContext('2d'), {
+            plugins: [ChartDataLabels],
+            type: "doughnut",
+            options: {
+                plugins: {
+                    datalabels: {
+                        color: "#FFFFFF"
+                    }
+                }
+            },
+            data: {
+                labels: [
+                    'Used Disk',
+                    'Free Disk',
+                ],
+                datasets: [{
+                    data: [],
+                    backgroundColor: [randomHexColor(), randomHexColor()],
+                    hoverOffset: 4
+                }]
+            }
+        })
+
+        while (true) {
+            const resources = await getResources()
+            const iterations = 60
+            const time = resources.date.split(" ")[1].split(".")[0]
+
+            // COMMON LABELS
+            if (chartLabels.length === iterations) {
+                chartLabels.shift()
+            }
+            chartLabels.push(time)
+
+            // CPU
+            for (let i = 0; i < resources.cpu.length; i++) {
+                // Init if empty
+                if (!cpuChart.data.datasets[i]) {
+                    cpuChart.data.datasets[i] = {
+                        data: [],
+                        label: i === 0 ? "GLOBAL CPU USAGE" : resources.cpu[i].Core,
+                        // color random
+                        borderColor: randomHexColor(),
+                    }
+                }
+                // append new element at end of the array and remove the first one
+                if (cpuChart.data.datasets[i].data.length === iterations) {
+                    cpuChart.data.datasets[i].data.shift()
+                }
+
+                cpuChart.data.datasets[i].data.push(resources.cpu[i].UsedPercentage)
             }
 
-            loop()
-        </script>
-    </body>
+            // MEMORY
+            memoryChart.data.datasets[0].data[0] = resources.memory.UsedMemory
+            memoryChart.data.datasets[1].data[0] = resources.memory.AvailableMemory
+
+            // DISK
+            diskChart.data.datasets[0].data[0] = resources.disk.UsedSpace
+            diskChart.data.datasets[0].data[1] = resources.disk.AvailableSpace
+
+            // UPDATE
+            cpuChart.update()
+            memoryChart.update()
+            diskChart.update()
+
+            await sleep(1000)
+        }
+    }
+
+    loop()
+</script>
+</body>
 </html>

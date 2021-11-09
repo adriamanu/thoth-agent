@@ -1,9 +1,11 @@
+dev:
+	goverwatch -command "go run main.go" -files "**/**/*.go server/chart.html"
 run:
 	go run *.go
-lint:
-	gofmt -l -w -s *.go
 build:
 	go build *.go
+lint:
+	gofmt -l -w -s *.go
 stress:
 	bash stress.sh
 stress_stop:

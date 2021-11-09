@@ -1,12 +1,12 @@
 package server
 
 import (
+	_ "embed"
 	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
 	"time"
-	_ "embed"
 
 	"github.com/adriamanu/thoth-agent/cpu"
 	"github.com/adriamanu/thoth-agent/disk"
@@ -48,7 +48,6 @@ func resourceUsageHandler(res http.ResponseWriter, req *http.Request) {
 	fmt.Fprintf(res, "%s", ru)
 }
 
-
 //go:embed chart.html
 var chart []byte
 
@@ -58,9 +57,9 @@ func visualizationHandler(res http.ResponseWriter, req *http.Request) {
 }
 
 func Server() {
-	http.HandleFunc("/", healthCheckHandler)
+	http.HandleFunc("/", visualizationHandler)
+	http.HandleFunc("/heartbeat", healthCheckHandler)
 	http.HandleFunc("/resource-usage", resourceUsageHandler)
-	http.HandleFunc("/visualization", visualizationHandler)
 
 	log.Fatal(http.ListenAndServe(":11805", nil))
 }
