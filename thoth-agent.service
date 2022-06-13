@@ -1,0 +1,14 @@
+[Unit]
+Description=thoth-agent expose system metrics through rest api on port 11805
+ 
+[Service]
+Type=simple
+WorkingDirectory=/usr/local/bin/
+ExecStart=thoth-agent
+Restart=on-failure
+ 
+# Configures the time to wait before service is stopped forcefully.
+TimeoutStopSec=180
+ 
+[Install]
+WantedBy=multi-user.target
